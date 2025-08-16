@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ShiftTrackerApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c9ba4522b4154599e9589fe30edcac4886b43642")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2dadd1dfa8985ba2cdb81838c1897c95f196f11b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ShiftTrackerApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ShiftTrackerApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
