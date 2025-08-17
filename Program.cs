@@ -1,24 +1,21 @@
-using Backend.Data;
-using Backend.Services;
 using Microsoft.EntityFrameworkCore;
+using ShiftTrackerApi.Models;
+using ShiftTrackerApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure EF Core (SQLite for now)
+// Configure EF Core with SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add custom services
-builder.Services.AddScoped<ShiftService>();
-
 var app = builder.Build();
 
-// Middleware
+// Enable Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -26,5 +23,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
