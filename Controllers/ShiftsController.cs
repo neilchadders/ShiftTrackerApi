@@ -6,8 +6,9 @@ using ShiftTrackerApi.Models;
 namespace ShiftTrackerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class ShiftsController : ControllerBase
+    [Route("shifts")]
+        public class ShiftsController : ControllerBase
+
     {
         private readonly AppDbContext _context;
 
@@ -49,6 +50,19 @@ namespace ShiftTrackerApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(shift);
+        }
+
+        // DELETE /shifts/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteShift(int id)
+        {
+            var shift = await _context.Shifts.FindAsync(id);
+            if (shift == null) return NotFound();
+
+            _context.Shifts.Remove(shift);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
