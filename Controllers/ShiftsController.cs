@@ -7,7 +7,7 @@ namespace ShiftTrackerApi.Controllers
 {
     [ApiController]
     [Route("shifts")]
-        public class ShiftsController : ControllerBase
+    public class ShiftsController : ControllerBase
 
     {
         private readonly AppDbContext _context;
@@ -64,5 +64,27 @@ namespace ShiftTrackerApi.Controllers
 
             return NoContent();
         }
+
+                // PUT /shifts/{id}
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateShift(int id, [FromBody] Shift updatedShift)
+{
+    if (id != updatedShift.Id)
+        return BadRequest("ID mismatch");
+
+    var existingShift = await _context.Shifts.FindAsync(id);
+    if (existingShift == null)
+        return NotFound();
+
+    // Update fields
+    existingShift.Date = updatedShift.Date;
+    existingShift.StartTime = updatedShift.StartTime;
+    existingShift.EndTime = updatedShift.EndTime;
+    existingShift.HourlyRate = updatedShift.HourlyRate;
+
+    await _context.SaveChangesAsync();
+    return Ok(existingShift);
+}
+
     }
 }
