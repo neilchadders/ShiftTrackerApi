@@ -40,17 +40,47 @@ namespace ShiftTrackerApi.Controllers
             return Ok(new { shifts, totalHours });
         }
 
-        // POST /shifts
-        [HttpPost]
+            [HttpPost]
         public async Task<IActionResult> AddShift([FromBody] Shift shift)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (shift.EndTime <= shift.StartTime)
+                return BadRequest("End time must be after start time.");
 
             _context.Shifts.Add(shift);
             await _context.SaveChangesAsync();
 
             return Ok(shift);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateShift(int id, [FromBody] Shift updatedShift)
+        {
+            if (id != updatedShift.Id)
+                return BadRequest("ID mismatch");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (updatedShift.EndTime <= updatedShift.StartTime)
+                return BadRequest("End time must be after start time.");
+
+            var existingShift = await _context.Shifts.FindAsync(id);
+            if (existingShift == null)
+                return NotFound();
+
+            existingShift.Date = updatedShift.Date;
+            existingShift.StartTime = updatedShift.StartTime;
+            existingShift.EndTime = updatedShift.EndTime;
+            existingShift.HourlyRate = updatedShift.HourlyRate;
+
+            await _context.SaveChangesAsync();
+            return Ok(existingShift);
+        }
+
+
 
         // DELETE /shifts/{id}
         [HttpDelete("{id}")]
@@ -65,26 +95,6 @@ namespace ShiftTrackerApi.Controllers
             return NoContent();
         }
 
-                // PUT /shifts/{id}
-[HttpPut("{id}")]
-public async Task<IActionResult> UpdateShift(int id, [FromBody] Shift updatedShift)
-{
-    if (id != updatedShift.Id)
-        return BadRequest("ID mismatch");
-
-    var existingShift = await _context.Shifts.FindAsync(id);
-    if (existingShift == null)
-        return NotFound();
-
-    // Update fields
-    existingShift.Date = updatedShift.Date;
-    existingShift.StartTime = updatedShift.StartTime;
-    existingShift.EndTime = updatedShift.EndTime;
-    existingShift.HourlyRate = updatedShift.HourlyRate;
-
-    await _context.SaveChangesAsync();
-    return Ok(existingShift);
-}
-
+                
     }
 }
