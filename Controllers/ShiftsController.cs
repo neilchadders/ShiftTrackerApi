@@ -8,7 +8,6 @@ namespace ShiftTrackerApi.Controllers
     [ApiController]
     [Route("shifts")]
     public class ShiftsController : ControllerBase
-
     {
         private readonly AppDbContext _context;
 
@@ -24,23 +23,27 @@ namespace ShiftTrackerApi.Controllers
             if (string.IsNullOrEmpty(month))
                 return BadRequest("Month is required in format YYYY-MM");
 
-            // Parse month
             var parts = month.Split('-');
             if (parts.Length != 2) return BadRequest("Invalid month format");
+
             int year = int.Parse(parts[0]);
             int monthNum = int.Parse(parts[1]);
 
             var shifts = await _context.Shifts
                 .Where(s => s.Date.Year == year && s.Date.Month == monthNum)
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.StartTime)
                 .ToListAsync();
 
-            // Calculate total hours
             double totalHours = shifts.Sum(s => (s.EndTime - s.StartTime).TotalHours);
 
-            return Ok(new { shifts, totalHours });
+            // Map to DTOs
+            var dtoList = shifts.Select(ShiftDto.FromShift).ToList();
+
+            return Ok(new { shifts = dtoList, totalHours });
         }
 
-            [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> AddShift([FromBody] Shift shift)
         {
             if (!ModelState.IsValid)
@@ -52,7 +55,7 @@ namespace ShiftTrackerApi.Controllers
             _context.Shifts.Add(shift);
             await _context.SaveChangesAsync();
 
-            return Ok(shift);
+            return Ok(ShiftDto.FromShift(shift));
         }
 
         [HttpPut("{id}")]
@@ -77,10 +80,9 @@ namespace ShiftTrackerApi.Controllers
             existingShift.HourlyRate = updatedShift.HourlyRate;
 
             await _context.SaveChangesAsync();
-            return Ok(existingShift);
+
+            return Ok(ShiftDto.FromShift(existingShift));
         }
-
-
 
         // DELETE /shifts/{id}
         [HttpDelete("{id}")]
@@ -94,7 +96,5 @@ namespace ShiftTrackerApi.Controllers
 
             return NoContent();
         }
-
-                
     }
 }
